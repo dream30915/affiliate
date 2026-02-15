@@ -1,0 +1,57 @@
+
+> affiliate-platform@0.1.0 build
+> prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to ./node_modules/@prisma/client in 238ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
+
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+✓ Compiled successfully in 8.1s
+  Running TypeScript ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/21) ...
+  Generating static pages using 7 workers (5/21) 
+  Generating static pages using 7 workers (10/21) 
+  Generating static pages using 7 workers (15/21) 
+✓ Generating static pages using 7 workers (21/21) in 2.3s
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /admin
+├ ƒ /admin/categories
+├ ƒ /admin/products
+├ ƒ /admin/products/new
+├ ƒ /admin/users
+├ ƒ /api/auth/[...nextauth]
+├ ƒ /api/forgot-password
+├ ƒ /api/register
+├ ƒ /api/reset-password
+├ ƒ /dashboard
+├ ƒ /dashboard/earnings
+├ ƒ /dashboard/links
+├ ƒ /dashboard/products
+├ ƒ /forgot-password
+├ ƒ /login
+├ ƒ /products
+├ ƒ /products/[id]
+├ ƒ /register
+└ ƒ /reset-password
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
