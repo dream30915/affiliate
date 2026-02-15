@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-deployment-version="1.0.1">
       <head>
         {GA_MEASUREMENT_ID && (
           <>
