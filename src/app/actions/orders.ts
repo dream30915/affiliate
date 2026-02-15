@@ -48,18 +48,13 @@ export async function createOrder(productId: string, quantity: number = 1) {
     let commission = 0
 
     // Resolve affiliate attribution from cookie
+    // Only attribute if the affiliate link's product matches the purchased product
     if (affiliateRef) {
         const affiliateLink = await prisma.affiliateLink.findUnique({
             where: { code: affiliateRef },
-            include: { product: true },
         })
 
-        if (affiliateLink) {
-            // Attribute the order to this affiliate link.
-            // The cookie stores the code of the LAST affiliate link clicked,
-            // so we attribute the full order to that affiliate regardless of
-            // whether the product in the link matches the product being purchased.
-            // Commission is calculated using the PURCHASED product's rate.
+        if (affiliateLink && affiliateLink.productId === productId) {
             affiliateLinkId = affiliateLink.id
             commission = total * (product.commission / 100)
         }
@@ -161,17 +156,20 @@ export async function createCartOrder(
         }
     })
 
-    // Resolve affiliate
+    // Resolve affiliate - only attribute if affiliate link's product is in the cart
     let affiliateLinkId: string | null = null
     if (affiliateRef) {
         const affiliateLink = await prisma.affiliateLink.findUnique({
             where: { code: affiliateRef },
         })
-        if (affiliateLink) {
+        if (affiliateLink && productMap.has(affiliateLink.productId)) {
             affiliateLinkId = affiliateLink.id
-            // Commission on the entire cart total, using average commission rate
-            const avgCommission = products.reduce((s, p) => s + p.commission, 0) / products.length
-            commission = total * (avgCommission / 100)
+            // Commission only on the matched product, not the entire cart
+            const matchedProduct = productMap.get(affiliateLink.productId)!
+            const matchedItem = items.find(i => i.productId === affiliateLink.productId)
+            if (matchedItem) {
+                commission = matchedProduct.price * matchedItem.quantity * (matchedProduct.commission / 100)
+            }
         }
     }
 

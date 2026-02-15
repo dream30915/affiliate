@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import Image from "next/image"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PromoteButton } from "@/components/PromoteButton"
 import { Badge } from "@/components/ui/badge"
@@ -31,11 +32,13 @@ export default async function AffiliateProductsPage() {
                         {products.map((product) => (
                             <TableRow key={product.id}>
                                 <TableCell>
-                                    <div className="h-12 w-12 rounded bg-muted overflow-hidden">
-                                        <img
+                                    <div className="h-12 w-12 rounded bg-muted overflow-hidden relative">
+                                        <Image
                                             src={product.image || "/placeholder.svg"}
                                             alt={product.name}
-                                            className="h-full w-full object-cover"
+                                            fill
+                                            sizes="48px"
+                                            className="object-cover"
                                         />
                                     </div>
                                 </TableCell>

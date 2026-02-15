@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcrypt'
-import 'dotenv/config'
 
-const prisma = new PrismaClient({
-    log: ['query', 'info', 'warn', 'error']
-})
+const { PrismaClient } = require('@prisma/client')
+const bcrypt = require('bcrypt')
+
+const prisma = new PrismaClient()
 
 async function main() {
     // Create Admin User
@@ -25,7 +23,7 @@ async function main() {
         },
     })
 
-    console.log({ admin })
+    console.log('Admin user upserted:', admin.email)
 
     // Create Categories
     const categoriesList = [
@@ -95,19 +93,19 @@ async function main() {
     ]
 
     for (const product of products) {
-        const p = await prisma.product.create({
-            data: product,
-        })
-        console.log(`Created product with id: ${p.id}`)
+        // Find if product already exists to avoid duplicates if possible, 
+        // but for now we'll just create or catch error
+        try {
+            const p = await prisma.product.create({
+                data: product,
+            })
+            console.log(`Created product: ${p.name}`)
+        } catch (e) {
+            console.log(`Product ${product.name} might already exist.`)
+        }
     }
 }
 
 main()
-    .then(async () => {
-        await prisma.$disconnect()
-    })
-    .catch(async (e) => {
-        console.error(e)
-        await prisma.$disconnect()
-        process.exit(1)
-    })
+    .catch(e => console.error(e))
+    .finally(() => prisma.$disconnect())

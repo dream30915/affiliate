@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -8,7 +9,10 @@ import { DollarSign, TrendingUp, MousePointerClick, ShoppingBag } from "lucide-r
 
 export default async function EarningsPage() {
     const session = await getServerSession(authOptions)
-    const userId = session?.user?.id
+    if (!session?.user?.id) {
+        redirect("/login")
+    }
+    const userId = session.user.id
 
     // ── Affiliate links with click counts ──
     const links = await prisma.affiliateLink.findMany({

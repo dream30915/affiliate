@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma"
 import { compare } from "bcrypt"
 
 export const authOptions: NextAuthOptions = {
-    adapter: PrismaAdapter(prisma) as any,
+    adapter: PrismaAdapter(prisma),
     session: {
         strategy: "jwt",
     },
@@ -70,11 +70,10 @@ export const authOptions: NextAuthOptions = {
         },
         jwt: ({ token, user }) => {
             if (user) {
-                const u = user as any
                 return {
                     ...token,
-                    id: u.id,
-                    role: u.role,
+                    id: (user as { id: string; role: string }).id,
+                    role: (user as { id: string; role: string }).role,
                 }
             }
             return token

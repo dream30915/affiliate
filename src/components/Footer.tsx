@@ -1,28 +1,32 @@
+import Link from "next/link"
+import { Sparkles } from "lucide-react"
+
 export function Footer() {
     return (
-        <footer className="border-t py-6 md:py-0">
-            <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
-                <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
-                    <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-                        Built by{" "}
-                        <a
-                            href="#"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="font-medium underline underline-offset-4"
-                        >
-                            AffiliatePlatform
-                        </a>
-                        . The source code is available on{" "}
-                        <a
-                            href="#"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="font-medium underline underline-offset-4"
-                        >
-                            GitHub
-                        </a>
-                        .
+        <footer className="border-t border-slate-100 bg-white/60 backdrop-blur-sm">
+            <div className="container px-6 py-12">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-2.5">
+                        <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-primary to-violet-500 flex items-center justify-center">
+                            <Sparkles className="h-3.5 w-3.5 text-white" />
+                        </div>
+                        <span className="font-bold text-sm tracking-tight text-slate-600">
+                            Affiliate<span className="text-primary">Hub</span>
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-6 text-sm text-slate-400">
+                        <Link href="/products" className="hover:text-slate-600 transition-colors">
+                            Products
+                        </Link>
+                        <Link href="/login" className="hover:text-slate-600 transition-colors">
+                            Sign In
+                        </Link>
+                        <Link href="/register" className="hover:text-slate-600 transition-colors">
+                            Get Started
+                        </Link>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                        &copy; {new Date().getFullYear()} AffiliateHub. All rights reserved.
                     </p>
                 </div>
             </div>

@@ -1,11 +1,13 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import {
     LayoutDashboard,
     Package,
     Users,
     LineChart,
-    Link as LinkIcon
+    Link as LinkIcon,
+    Tag,
+    Sparkles,
+    Home
 } from "lucide-react"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
@@ -25,81 +27,104 @@ export default async function DashboardLayout({
 
     const isAdmin = session.user.role === "ADMIN"
     const userEmail = session.user.email || "Unknown"
+    const userName = session.user.name || "User"
     const userInitial = (session.user.name?.[0] || session.user.email?.[0] || "?").toUpperCase()
 
     return (
-        <div className="flex min-h-screen">
+        <div className="flex min-h-screen bg-slate-50/80">
             {/* Sidebar */}
-            <aside className="w-64 border-r bg-muted/40 hidden md:flex flex-col">
-                <div className="h-16 flex items-center px-6 border-b font-semibold text-lg">
-                    AffiliateAdmin
-                </div>
-                <nav className="flex-1 p-4 space-y-2">
-                    <Link href="/dashboard">
-                        <Button variant="ghost" className="w-full justify-start">
-                            <LayoutDashboard className="mr-2 h-4 w-4" />
-                            Overview
-                        </Button>
+            <aside className="w-64 bg-white border-r border-slate-100 hidden md:flex flex-col sticky top-0 h-screen">
+                {/* Logo */}
+                <div className="h-16 flex items-center px-6 border-b border-slate-100">
+                    <Link href="/" className="flex items-center gap-2.5">
+                        <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-violet-500 flex items-center justify-center shadow-md shadow-primary/20">
+                            <Sparkles className="h-4 w-4 text-white" />
+                        </div>
+                        <span className="font-bold text-lg tracking-tight text-slate-800">
+                            Affiliate<span className="text-primary">Hub</span>
+                        </span>
                     </Link>
+                </div>
+
+                {/* Navigation */}
+                <div className="flex-1 overflow-y-auto px-3 py-5 space-y-6">
+                    <div>
+                        <div className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+                            Overview
+                        </div>
+                        <nav className="space-y-0.5">
+                            <Link href="/dashboard" className="sidebar-link sidebar-link-active">
+                                <LayoutDashboard className="w-[18px] h-[18px]" />
+                                <span>Dashboard</span>
+                            </Link>
+                            <Link href="/" className="sidebar-link">
+                                <Home className="w-[18px] h-[18px]" />
+                                <span>Back to Site</span>
+                            </Link>
+                        </nav>
+                    </div>
 
                     {isAdmin && (
-                        <>
-                            <div className="pt-4 pb-2 px-4 text-xs font-semibold text-muted-foreground">
-                                ADMIN
+                        <div>
+                            <div className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+                                Admin
                             </div>
-                            <Link href="/admin">
-                                <Button variant="ghost" className="w-full justify-start">
-                                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                                    Admin Dashboard
-                                </Button>
-                            </Link>
-                            <Link href="/admin/products">
-                                <Button variant="ghost" className="w-full justify-start">
-                                    <Package className="mr-2 h-4 w-4" />
-                                    Products
-                                </Button>
-                            </Link>
-                            <Link href="/admin/users">
-                                <Button variant="ghost" className="w-full justify-start">
-                                    <Users className="mr-2 h-4 w-4" />
-                                    Users
-                                </Button>
-                            </Link>
-                        </>
+                            <nav className="space-y-0.5">
+                                <Link href="/admin" className="sidebar-link">
+                                    <LayoutDashboard className="w-[18px] h-[18px]" />
+                                    <span>Admin Overview</span>
+                                </Link>
+                                <Link href="/admin/products" className="sidebar-link">
+                                    <Package className="w-[18px] h-[18px]" />
+                                    <span>Products</span>
+                                </Link>
+                                <Link href="/admin/categories" className="sidebar-link">
+                                    <Tag className="w-[18px] h-[18px]" />
+                                    <span>Categories</span>
+                                </Link>
+                                <Link href="/admin/users" className="sidebar-link">
+                                    <Users className="w-[18px] h-[18px]" />
+                                    <span>Users</span>
+                                </Link>
+                            </nav>
+                        </div>
                     )}
 
-                    <div className="pt-4 pb-2 px-4 text-xs font-semibold text-muted-foreground">
-                        AFFILIATE
+                    <div>
+                        <div className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+                            Affiliate
+                        </div>
+                        <nav className="space-y-0.5">
+                            <Link href="/dashboard/links" className="sidebar-link">
+                                <LinkIcon className="w-[18px] h-[18px]" />
+                                <span>My Links</span>
+                            </Link>
+                            <Link href="/dashboard/earnings" className="sidebar-link">
+                                <LineChart className="w-[18px] h-[18px]" />
+                                <span>Earnings</span>
+                            </Link>
+                        </nav>
                     </div>
-                    <Link href="/dashboard/links">
-                        <Button variant="ghost" className="w-full justify-start">
-                            <LinkIcon className="mr-2 h-4 w-4" />
-                            My Links
-                        </Button>
-                    </Link>
-                    <Link href="/dashboard/earnings">
-                        <Button variant="ghost" className="w-full justify-start">
-                            <LineChart className="mr-2 h-4 w-4" />
-                            Earnings
-                        </Button>
-                    </Link>
-                </nav>
-                <div className="p-4 border-t">
+                </div>
+
+                {/* User Section */}
+                <div className="p-4 border-t border-slate-100">
+                    <div className="flex items-center gap-3 px-2 mb-3">
+                        <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-primary to-violet-500 flex items-center justify-center text-white text-sm font-semibold shrink-0">
+                            {userInitial}
+                        </div>
+                        <div className="min-w-0">
+                            <div className="text-sm font-medium text-slate-700 truncate">{userName}</div>
+                            <div className="text-[11px] text-slate-400 truncate">{userEmail}</div>
+                        </div>
+                    </div>
                     <SignOutButton />
                 </div>
             </aside>
 
-            {/* Main Content */}
-            <main className="flex-1 flex flex-col">
-                <header className="h-16 border-b flex items-center justify-end px-6">
-                    <div className="flex items-center gap-4">
-                        <span className="text-sm text-muted-foreground">{userEmail}</span>
-                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                            {userInitial}
-                        </div>
-                    </div>
-                </header>
-                <div className="p-6 md:p-8 flex-1 overflow-auto">
+            {/* Main */}
+            <main className="flex-1 flex flex-col min-w-0">
+                <div className="p-6 md:p-8 max-w-7xl mx-auto w-full">
                     {children}
                 </div>
             </main>

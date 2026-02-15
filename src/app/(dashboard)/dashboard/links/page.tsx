@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -9,7 +10,10 @@ import { CopyLinkButton } from "@/components/CopyLinkButton"
 
 export default async function LinksPage() {
     const session = await getServerSession(authOptions)
-    const userId = session?.user?.id
+    if (!session?.user?.id) {
+        redirect("/login")
+    }
+    const userId = session.user.id
 
     const links = await prisma.affiliateLink.findMany({
         where: { userId },

@@ -1,39 +1,64 @@
 import { prisma } from "@/lib/prisma"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { redirect } from "next/navigation"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, UserCheck, MousePointerClick, DollarSign } from "lucide-react"
 
 export default async function AdminUsersPage() {
-    // ── Fetch users with deep stats ──
+    const session = await getServerSession(authOptions)
+    if (!session || session.user.role !== "ADMIN") {
+        redirect("/dashboard")
+    }
+
+    // ── Fetch users with counts (avoids deep N+1 nesting) ──
     const users = await prisma.user.findMany({
         include: {
             _count: {
                 select: { affiliateLinks: true, orders: true },
             },
-            affiliateLinks: {
-                include: {
-                    _count: { select: { clicks: true } },
-                    orders: {
-                        where: { status: "COMPLETED" },
-                        select: { commission: true },
-                    },
-                },
-            },
         },
         orderBy: { createdAt: "desc" },
     })
 
-    // ── Per-user computed stats ──
-    const usersWithStats = users.map((user) => {
-        const totalClicks = user.affiliateLinks.reduce(
-            (sum, link) => sum + link._count.clicks, 0
-        )
-        const totalCommissionEarned = user.affiliateLinks.reduce(
-            (sum, link) => sum + link.orders.reduce((s, o) => s + o.commission, 0), 0
-        )
-        return { ...user, totalClicks, totalCommissionEarned }
+    // ── Aggregate clicks per user via a single query ──
+    const clicksByUser = await prisma.click.groupBy({
+        by: ["affiliateLinkId"],
+        _count: { id: true },
     })
+    const linkToUser = await prisma.affiliateLink.findMany({
+        select: { id: true, userId: true },
+    })
+    const linkUserMap = new Map(linkToUser.map(l => [l.id, l.userId]))
+    const userClicksMap = new Map<string, number>()
+    for (const c of clicksByUser) {
+        const userId = linkUserMap.get(c.affiliateLinkId)
+        if (userId) {
+            userClicksMap.set(userId, (userClicksMap.get(userId) || 0) + c._count.id)
+        }
+    }
+
+    // ── Aggregate commissions per user via a single query ──
+    const completedOrders = await prisma.order.findMany({
+        where: { status: "COMPLETED", affiliateLinkId: { not: null } },
+        select: { affiliateLinkId: true, commission: true },
+    })
+    const userCommissionMap = new Map<string, number>()
+    for (const o of completedOrders) {
+        const userId = linkUserMap.get(o.affiliateLinkId!)
+        if (userId) {
+            userCommissionMap.set(userId, (userCommissionMap.get(userId) || 0) + o.commission)
+        }
+    }
+
+    // ── Per-user computed stats ──
+    const usersWithStats = users.map((user) => ({
+        ...user,
+        totalClicks: userClicksMap.get(user.id) || 0,
+        totalCommissionEarned: userCommissionMap.get(user.id) || 0,
+    }))
 
     // ── Platform-wide summary ──
     const totalUsers = users.length

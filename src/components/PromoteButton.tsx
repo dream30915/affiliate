@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { getAffiliateLink } from "@/app/actions/affiliate"
 import { toast } from "sonner"
-import { Link as LinkIcon, Copy, Check } from "lucide-react"
+import { Link as LinkIcon, Copy } from "lucide-react"
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import {
@@ -18,20 +18,18 @@ import {
 } from "@/components/ui/dialog"
 
 export function PromoteButton({ productId, productName }: { productId: string, productName: string }) {
-    const [code, setCode] = useState("")
     const [link, setLink] = useState("")
     const [isOpen, setIsOpen] = useState(false)
 
     const handleGetLink = async () => {
         try {
             const affiliateCode = await getAffiliateLink(productId)
-            setCode(affiliateCode)
             // Construct full URL (assuming localhost for dev, should use env var)
             const origin = window.location.origin
             const fullLink = `${origin}/products/${productId}?ref=${affiliateCode}`
             setLink(fullLink)
             setIsOpen(true)
-        } catch (error) {
+        } catch {
             toast.error("Failed to generate link. Please try again.")
         }
     }

@@ -62,17 +62,50 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
 model Product {
-  id          String   @id @default(cuid())
-  name        String
-  description String
-  price       Float
-  image       String
-  commission  Float    @default(10.0) // Percentage
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(cuid())
+  name           String
+  description    String
+  price          Float
+  discount       Float    @default(0) // Percentage discount
+  image          String
+  commission     Float    @default(10.0) // Percentage
+  featured       Boolean  @default(false)
+  affiliateUrl   String?  // The direct affiliate link to the external store
+  categoryId     String?
+  category       Category? @relation(fields: [categoryId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
   affiliateLinks AffiliateLink[]
-  orderItems  OrderItem[]
+  orderItems     OrderItem[]
+  reviews        Review[]
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  name      String
+  rating    Int      // 1-5
+  comment   String
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
 }
 
 model AffiliateLink {
